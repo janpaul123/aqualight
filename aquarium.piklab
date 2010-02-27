@@ -2,7 +2,7 @@
 <piklab>
   <general>
     <device>16F874A</device>
-    <tool>sdcc</tool>
+    <tool>c18</tool>
     <files>
       <item>aquarium.c</item>
       <item>aquarium.h</item>
