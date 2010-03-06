@@ -28,6 +28,13 @@ typedef unsigned int word;
 unsigned long tick=0;
 unsigned long lasttick=0;
 
+unsigned char program=0;
+unsigned char delay=30;
+unsigned char wait=0;
+
+unsigned char globalI=0;
+unsigned char globalJ=0;
+
 
 #pragma code high_vector=0x08
 void interrupt_at_high_vector(void)
@@ -88,7 +95,7 @@ void on_init()
 {
 	ADCON1=6;		//AD converter uit
 	CCP2CON=0;
-	TRIS_SW1 = 1;	//Knop1 input green draad green vertrachen van de led 
+	TRIS_SW1 = 1;	//Knop1 input green draad green vertragen van de led 
 	TRIS_SW2 = 1;	//Knop2 input white draad blue van programma wisselen < achteruit
 	TRIS_SW3 = 1;	//Knop3 input yellow draad orange van programma wisselen> vooruituit
 	TRIS_SW4 = 1;	//Knop4 input blue draad bruin versnellen van de led 
@@ -207,23 +214,12 @@ void setLEDBothDiscrete(char number, char value, char mirror)
 		number += 11;
 	setLEDDiscrete(number, value);
 }
-/*
-void setLEDPWM(char number, char value)
+
+void setAll (char value)
 {
-	PWM[number] = value;
-}*/
-/*
-void setLEDBothPWM(char number, char value, char mirror)
-{
-	if (number < 11)
-		setLEDPWM(number, value);
-	
-	if (mirror)
-		number = 22-number;
-	else
-		number += 11;
-	setLEDPWM(number, value);
-}*/
+	int i;
+	for (i=0; i<23; i++) setLEDDiscrete(i, value);
+}
 
 
 void setColor (color c, char value,char box)
@@ -275,59 +271,106 @@ void setColor (color c, char value,char box)
 	}
 }
 
+void resetGlobals()
+{
+	globalI = 0;
+	globalJ = 0;
+}
+
+void readInputs()
+{
+	if (SW1 == 1 || SW2 == 1 || SW3 == 1 || SW4 == 1)
+	{
+		if (!wait)
+		{
+			if (SW1 == 1) {
+				if (delay < 40) delay++;
+			}
+					
+			if (SW4 == 1) {
+				if (delay > 5) delay--;
+			}
+					
+			if (SW2 == 1) {
+				if (program > 0) program = 1;
+				else program--;
+				resetGlobals();
+			}
+				
+			if (SW3 == 1) {
+				program++;
+				if (program > 1) program = 0;
+				resetGlobals();
+			}
+			setAll(1);
+			wait = 1;
+		}
+	}
+	else
+	{
+		if (wait)
+		{
+			setAll(0);
+			wait = 0;
+		}
+	}
+}
+
+void programInit()
+{
+	switch(program)
+	{
+		default:
+			setAll(0);
+	}
+}
+
+void programRun()
+{
+	switch(program)
+	{
+		case 0:
+			setLEDDiscrete(globalI, 0);
+			globalI++;
+			if (globalI >= 23) globalI = 0;
+			setLEDDiscrete(globalI, 1);
+			break;
+		case 1:
+			setLEDDiscrete(globalI, 0);
+			globalI--;
+			if (globalI >= 23) globalI = 22;
+			setLEDDiscrete(globalI, 1);
+			break;
+	}
+}
+
+void program1()
+{
+	
+}
+
 /*
  * Main program
  */
 void main() 
 {
-	char i=0;
-	unsigned int j=0;
-	//unsigned char PWMCycle=0;
-	//unsigned char PWM[23];
-	color c1=Red,c2=Blue;
+	unsigned long i=0, j=0;
 	on_init();
 	timer1_init();
-	//for(i=0;i<23;i++)
-	//	PWM[i] = i;//setLEDPWM(i,i);
 	
 	while(1)
 	{
-
-	/*	PWMCycle++;
-		if (PWMCycle >= PWM_LENGTH) 
-			PWMCycle = 0;
-		
-		for(i=0;i<=22;i++)
+		if (!wait && i > (600*delay))
 		{
-			if(PWMCycle == PWM[i])
-				setLEDDiscrete(i, 0);
-			if(PWMCycle == 0)
-				setLEDDiscrete(i, 1);
+			programRun();
+			i=0;
 		}
-	*/	
-		//delayMs(10);
-	/*	setLEDBothDiscrete(i,0,0);
-		if(i>0)setLEDBothDiscrete(i-1,1,0);
-		else setLEDBothDiscrete(11,1,0);
-		i++;
-		if(i>11)i=0;
-		delayMs(100);	*/
-		//for(j=0;j<50000;j++)continue;
-		if(c1<Warmwhite)c1++;
-		else c1 = Yellow;
-		setColor(c1,1,1);
-		if(c1>Yellow)
-			setColor(c1-1,0,1);
-		else setColor(Warmwhite,0,1);
-		if(c2<Warmwhite)c2++;
-		else c2 = Yellow;
-		setColor(c2,1,2);
-		if(c2>Yellow)
-			setColor(c2-1,0,2);
-		else setColor(Warmwhite,0,2);
-		for(j=0;j<50000;j++)continue;
+		else i++;
 		
-
+		if (j>5000)  {
+			readInputs();
+			j=0;
+		}
+		else j++;
 	}
-
 }
