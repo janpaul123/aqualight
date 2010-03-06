@@ -113,9 +113,9 @@ void setLEDBothDiscrete(char number, char value, char mirror);
 
 void setAll (char value);
 void setColor (color c, char value,char box);
-void resetGlobals();
 void readInputs();
-void program0();
+void programInit();
+void programRun();
 
 // set a led, number directly corresponds with LEDxx (value between 0 and PWM_LENGTH)
 //void setLEDPWM(char number, char value);

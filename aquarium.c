@@ -29,8 +29,12 @@ unsigned long tick=0;
 unsigned long lasttick=0;
 
 unsigned char program=0;
-unsigned char delay=30;
+unsigned char delay=10;
 unsigned char wait=0;
+unsigned char newProgram=0;
+
+unsigned char framebuffer[23];
+unsigned char PWM[23];
 
 unsigned char globalI=0;
 unsigned char globalJ=0;
@@ -215,10 +219,16 @@ void setLEDBothDiscrete(char number, char value, char mirror)
 	setLEDDiscrete(number, value);
 }
 
+void setLEDFade(char number, char value)
+{
+	framebuffer[number] = value;
+	//if (value) PWM[number] = 6;
+}
+
 void setAll (char value)
 {
 	int i;
-	for (i=0; i<23; i++) setLEDDiscrete(i, value);
+	for (i=0; i<23; i++) setLEDFade(i, value);
 }
 
 
@@ -271,12 +281,6 @@ void setColor (color c, char value,char box)
 	}
 }
 
-void resetGlobals()
-{
-	globalI = 0;
-	globalJ = 0;
-}
-
 void readInputs()
 {
 	if (SW1 == 1 || SW2 == 1 || SW3 == 1 || SW4 == 1)
@@ -284,25 +288,27 @@ void readInputs()
 		if (!wait)
 		{
 			if (SW1 == 1) {
-				if (delay < 40) delay++;
+				if (delay < 15) delay++;
 			}
 					
 			if (SW4 == 1) {
-				if (delay > 5) delay--;
+				if (delay > 1) delay--;
 			}
 					
 			if (SW2 == 1) {
-				if (program > 0) program = 1;
+				if (program <= 0) program = 1;
 				else program--;
-				resetGlobals();
+				setAll(1);
+				newProgram = 1;
 			}
 				
 			if (SW3 == 1) {
 				program++;
 				if (program > 1) program = 0;
-				resetGlobals();
+				setAll(1);
+				newProgram = 1;
 			}
-			setAll(1);
+			
 			wait = 1;
 		}
 	}
@@ -310,7 +316,12 @@ void readInputs()
 	{
 		if (wait)
 		{
-			setAll(0);
+			if (newProgram) 
+			{
+				newProgram = 0;
+				programInit();
+				programRun();
+			}
 			wait = 0;
 		}
 	}
@@ -330,23 +341,18 @@ void programRun()
 	switch(program)
 	{
 		case 0:
-			setLEDDiscrete(globalI, 0);
+			setLEDFade(globalI, 0);
 			globalI++;
 			if (globalI >= 23) globalI = 0;
-			setLEDDiscrete(globalI, 1);
+			setLEDFade(globalI, 1);
 			break;
 		case 1:
-			setLEDDiscrete(globalI, 0);
+			setLEDFade(globalI, 0);
 			globalI--;
 			if (globalI >= 23) globalI = 22;
-			setLEDDiscrete(globalI, 1);
+			setLEDFade(globalI, 1);
 			break;
 	}
-}
-
-void program1()
-{
-	
 }
 
 /*
@@ -354,23 +360,46 @@ void program1()
  */
 void main() 
 {
-	unsigned long i=0, j=0;
+	unsigned long i=0, j=0, k=0;
+	unsigned char pwmpos=0, pwmled=0;
 	on_init();
 	timer1_init();
+	programInit();
 	
 	while(1)
 	{
-		if (!wait && i > (600*delay))
+		if (!wait)
 		{
-			programRun();
-			i=0;
+			for(pwmled=0; pwmled<23; pwmled++)
+			{
+				setLEDDiscrete(pwmled, PWM[pwmled] > pwmpos);
+			}
+			pwmpos++;
+			if (pwmpos >= 6) pwmpos = 0;
+			
+			if (k>20) {
+				for(pwmled=0; pwmled<23; pwmled++)
+				{
+					if (!framebuffer[pwmled] && PWM[pwmled]) PWM[pwmled]--;
+					if (framebuffer[pwmled]  && PWM[pwmled] < 6) PWM[pwmled]++;
+				}
+				k=0;
+			}
+			
+			if (i > (100*delay))
+			{
+				programRun();
+				i=0;
+			}
 		}
-		else i++;
 		
-		if (j>5000)  {
+		if (j>10)  {
 			readInputs();
 			j=0;
 		}
-		else j++;
+		
+		i++;
+		j++;
+		k++;
 	}
 }
