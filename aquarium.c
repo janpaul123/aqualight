@@ -88,10 +88,10 @@ void on_init()
 {
 	ADCON1=6;		//AD converter uit
 	CCP2CON=0;
-	TRIS_SW1 = 1;	//Knop1 input
-	TRIS_SW2 = 1;	//Knop2 input
-	TRIS_SW3 = 1;	//Knop3 input
-	TRIS_SW4 = 1;	//Knop4 input
+	TRIS_SW1 = 1;	//Knop1 input green draad green vertrachen van de led 
+	TRIS_SW2 = 1;	//Knop2 input white draad blue van programma wisselen < achteruit
+	TRIS_SW3 = 1;	//Knop3 input yellow draad orange van programma wisselen> vooruituit
+	TRIS_SW4 = 1;	//Knop4 input blue draad bruin versnellen van de led 
 	
 	TRIS_LED0 = 0; //Led0 output
 	TRIS_LED1 = 0; //Led1 output
@@ -123,73 +123,73 @@ void setLEDDiscrete(char number, char value)
 	switch(number)
 	{
 		case 0:
-			LED0 = (value?1:0);
+			LED0 = (value?0:1);
 			break;
 		case 1:
-			LED1 = (value?1:0);
+			LED1 = (value?0:1);
 			break;
 		case 2:
-			LED2 = (value?1:0);
+			LED2 = (value?0:1);
 			break;
 		case 3:
-			LED3 = (value?1:0);
+			LED3 = (value?0:1);
 			break;
 		case 4:
-			LED4 = (value?1:0);
+			LED4 = (value?0:1);
 			break;
 		case 5:
-			LED5 = (value?1:0);
+			LED5 = (value?0:1);
 			break;
 		case 6:
-			LED6 = (value?1:0);
+			LED6 = (value?0:1);
 			break;
 		case 7:
-			LED7 = (value?1:0);
+			LED7 = (value?0:1);
 			break;
 		case 8:
-			LED8 = (value?1:0);
+			LED8 = (value?0:1);
 			break;
 		case 9:
-			LED9 = (value?1:0);
+			LED9 = (value?0:1);
 			break;
 		case 10:
-			LED10 = (value?1:0);
+			LED10 = (value?0:1);
 			break;
 		case 11:
-			LED11 = (value?1:0);
+			LED11 = (value?0:1);
 			break;
 		case 12:
-			LED12 = (value?1:0);
+			LED12 = (value?0:1);
 			break;
 		case 13:
-			LED13 = (value?1:0);
+			LED13 = (value?0:1);
 			break;
 		case 14:
-			LED14 = (value?1:0);
+			LED14 = (value?0:1);
 			break;
 		case 15:
-			LED15 = (value?1:0);
+			LED15 = (value?0:1);
 			break;
 		case 16:
-			LED16 = (value?1:0);
+			LED16 = (value?0:1);
 			break;
 		case 17:
-			LED17 = (value?1:0);
+			LED17 = (value?0:1);
 			break;
 		case 18:
-			LED18 = (value?1:0);
+			LED18 = (value?0:1);
 			break;
 		case 19:
-			LED19 = (value?1:0);
+			LED19 = (value?0:1);
 			break;
 		case 20:
-			LED20 = (value?1:0);
+			LED20 = (value?0:1);
 			break;
 		case 21:
-			LED21 = (value?1:0);
+			LED21 = (value?0:1);
 			break;
 		case 22:
-			LED22 = (value?1:0);
+			LED22 = (value?0:1);
 			break;
 		default:
 			break;	
@@ -226,6 +226,55 @@ void setLEDBothPWM(char number, char value, char mirror)
 }*/
 
 
+void setColor (color c, char value,char box)
+{
+	char i,begin,end;
+	if(box==0){begin=0; end=22;}
+	if(box==1){begin=0; end=10;}
+	if(box==2){begin=11; end=22;}
+	switch (c)
+	{
+		case Yellow:
+			for(i=1;i<=yellow[0];i++)
+			{
+				if((yellow[i]>=begin)&&(yellow[i]<=end))setLEDDiscrete(yellow[i],value);
+			}
+			break;
+		case Green: 
+			for(i=1;i<=green[0];i++)
+			{
+				if((green[i]>=begin)&&(green[i]<=end))setLEDDiscrete(green[i],value);
+			}
+			break;
+		case Red: 
+			for(i=1;i<=red[0];i++)
+			{
+				if((red[i]>=begin)&&(red[i]<=end))setLEDDiscrete(red[i],value);
+			}
+			break;
+		case Blue:
+			for(i=1;i<=blue[0];i++)
+			{
+				if((blue[i]>=begin)&&(blue[i]<=end))setLEDDiscrete(blue[i],value);
+			}
+			break;
+		case White: 
+			for(i=1;i<=white[0];i++)
+			{
+				if((white[i]>=begin)&&(white[i]<=end))setLEDDiscrete(white[i],value);
+			}
+			break;
+		case Warmwhite:
+			for(i=1;i<=warmwhite[0];i++)
+			{
+				if((warmwhite[i]>=begin)&&(warmwhite[i]<=end))setLEDDiscrete(warmwhite[i],value);
+			}
+			break;
+		default:
+			break;
+	}
+}
+
 /*
  * Main program
  */
@@ -233,13 +282,13 @@ void main()
 {
 	char i=0;
 	unsigned int j=0;
-	unsigned char PWMCycle=0;
-	unsigned char PWM[23];
-	
+	//unsigned char PWMCycle=0;
+	//unsigned char PWM[23];
+	color c1=Red,c2=Blue;
 	on_init();
 	timer1_init();
-	for(i=0;i<23;i++)
-		PWM[i] = i;//setLEDPWM(i,i);
+	//for(i=0;i<23;i++)
+	//	PWM[i] = i;//setLEDPWM(i,i);
 	
 	while(1)
 	{
@@ -257,13 +306,27 @@ void main()
 		}
 	*/	
 		//delayMs(10);
-		setLEDBothDiscrete(i,0,0);
+	/*	setLEDBothDiscrete(i,0,0);
 		if(i>0)setLEDBothDiscrete(i-1,1,0);
 		else setLEDBothDiscrete(11,1,0);
 		i++;
 		if(i>11)i=0;
-		//delayMs(100);	
+		delayMs(100);	*/
+		//for(j=0;j<50000;j++)continue;
+		if(c1<Warmwhite)c1++;
+		else c1 = Yellow;
+		setColor(c1,1,1);
+		if(c1>Yellow)
+			setColor(c1-1,0,1);
+		else setColor(Warmwhite,0,1);
+		if(c2<Warmwhite)c2++;
+		else c2 = Yellow;
+		setColor(c2,1,2);
+		if(c2>Yellow)
+			setColor(c2-1,0,2);
+		else setColor(Warmwhite,0,2);
 		for(j=0;j<50000;j++)continue;
+		
 
 	}
 

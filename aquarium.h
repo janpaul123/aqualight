@@ -78,7 +78,15 @@
 #error "TMR1_PRESET te klein"
 #endif
 
+const rom char yellow[6]={5,0,4,9,15,18};
+const rom char green[5]={4,1,6,13,21};
+const rom char red [4]={3,7,14,19};
+const rom char blue [5]={4,3,10,12,17};
+const rom char white[4]={3,8,11,20};
+const rom char warmwhite[5]={4,2,5,16,22};
 
+
+typedef enum _color {Yellow, Green, Red, Blue, White, Warmwhite}color;
 // timer interrupt
 void isr();
 
@@ -93,6 +101,8 @@ void delayS(unsigned long time);
 
 // initialization
 void on_init();
+
+void setColor(color c, char value, char box);
 
 // set a led, number directly corresponds with LEDxx (only on and off)
 void setLEDDiscrete(char number, char value);
