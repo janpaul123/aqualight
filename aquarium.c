@@ -28,7 +28,7 @@ typedef unsigned int word;
 unsigned long tick=0;
 unsigned long lasttick=0;
 
-unsigned long delay=10;
+unsigned long delay=1;
 unsigned char program=0;
 unsigned char wait=0;
 unsigned char newProgram=0;
@@ -38,6 +38,7 @@ unsigned char PWM[23];
 
 unsigned char globalI=0;
 unsigned char globalJ=0;
+
 
 
 #pragma code high_vector=0x08
@@ -413,6 +414,17 @@ void programRun()
 			setLEDBothDiscreteFade(globalI, 1, 0);
 			setLEDBothDiscreteFade(11-globalI, 1, 0);
 			break;
+		case 8:
+			if (globalJ < 3) globalJ = 3;
+			setLEDDiscreteFade((globalI-globalJ+23) % 23,0);
+			setLEDDiscreteFade(globalI,1);
+			globalI++;
+			if (globalI >= 23)
+			{
+				globalJ++;
+				if(globalJ >= 22) globalJ = 3;
+				globalI = 0;
+			}
 	}
 }
 
