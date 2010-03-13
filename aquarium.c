@@ -490,6 +490,17 @@ void programRun()
 			}
 			setLEDBothDiscreteFade(globalI,globalJ,0);
 			break;
+		case 11:
+			if(globalI == 0)
+			{
+				setAll(1);
+				globalI = 1;
+			}
+			else
+			{
+				setAll(0);
+				globalI = 0;
+			}
 	}
 }
 
