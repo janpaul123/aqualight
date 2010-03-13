@@ -288,7 +288,7 @@ void readInputs()
 		if (!wait)
 		{
 			if (SW1 == 1) {
-				if (delay < 15) delay++;
+				if (delay < 40) delay++;
 			}
 					
 			if (SW4 == 1) {
