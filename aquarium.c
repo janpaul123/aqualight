@@ -260,37 +260,37 @@ void setColor (color c, char value,char box)
 		case Yellow:
 			for(i=1;i<=yellow[0];i++)
 			{
-				if((yellow[i]>=begin)&&(yellow[i]<=end))setLEDDiscrete(yellow[i],value);
+				if((yellow[i]>=begin)&&(yellow[i]<=end))setLEDDiscreteFade(yellow[i],value);
 			}
 			break;
 		case Green: 
 			for(i=1;i<=green[0];i++)
 			{
-				if((green[i]>=begin)&&(green[i]<=end))setLEDDiscrete(green[i],value);
+				if((green[i]>=begin)&&(green[i]<=end))setLEDDiscreteFade(green[i],value);
 			}
 			break;
 		case Red: 
 			for(i=1;i<=red[0];i++)
 			{
-				if((red[i]>=begin)&&(red[i]<=end))setLEDDiscrete(red[i],value);
+				if((red[i]>=begin)&&(red[i]<=end))setLEDDiscreteFade(red[i],value);
 			}
 			break;
 		case Blue:
 			for(i=1;i<=blue[0];i++)
 			{
-				if((blue[i]>=begin)&&(blue[i]<=end))setLEDDiscrete(blue[i],value);
+				if((blue[i]>=begin)&&(blue[i]<=end))setLEDDiscreteFade(blue[i],value);
 			}
 			break;
 		case White: 
 			for(i=1;i<=white[0];i++)
 			{
-				if((white[i]>=begin)&&(white[i]<=end))setLEDDiscrete(white[i],value);
+				if((white[i]>=begin)&&(white[i]<=end))setLEDDiscreteFade(white[i],value);
 			}
 			break;
 		case Warmwhite:
 			for(i=1;i<=warmwhite[0];i++)
 			{
-				if((warmwhite[i]>=begin)&&(warmwhite[i]<=end))setLEDDiscrete(warmwhite[i],value);
+				if((warmwhite[i]>=begin)&&(warmwhite[i]<=end))setLEDDiscreteFade(warmwhite[i],value);
 			}
 			break;
 		default:
@@ -501,6 +501,12 @@ void programRun()
 				setAll(0);
 				globalI = 0;
 			}
+			break;
+		case 12:
+			setColor(globalI,0,0);
+			globalI++;
+			if(globalI >= 6) globalI = 0;
+			setColor(globalI,1,0);
 	}
 }
 
