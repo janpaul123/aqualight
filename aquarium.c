@@ -345,6 +345,8 @@ void readInputs()
 
 void programInit()
 {
+	globalI=0;
+	globalJ=0;
 	switch(program)
 	{
 		case 2:
@@ -352,6 +354,10 @@ void programInit()
 		case 4:
 		case 5:
 			setAll(1);
+			break;
+		case 8:
+			globalJ = 3;
+			setAll(0);
 			break;
 		default:
 			setAll(0);
@@ -415,7 +421,6 @@ void programRun()
 			setLEDBothDiscreteFade(11-globalI, 1, 0);
 			break;
 		case 8:
-			if (globalJ < 3) globalJ = 3;
 			setLEDDiscreteFade((globalI-globalJ+23) % 23,0);
 			setLEDDiscreteFade(globalI,1);
 			globalI++;
