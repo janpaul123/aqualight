@@ -28,8 +28,8 @@ typedef unsigned int word;
 unsigned long tick=0;
 unsigned long lasttick=0;
 
+unsigned long delay=10;
 unsigned char program=0;
-unsigned char delay=10;
 unsigned char wait=0;
 unsigned char newProgram=0;
 
@@ -207,28 +207,43 @@ void setLEDDiscrete(char number, char value)
 	}
 }
 
-void setLEDBothDiscrete(char number, char value, char mirror)
+void setLEDDiscreteFade(char number, char value)
+{
+	framebuffer[number] = (value ? PWM_LENGTH : 0);
+}
+
+void setLEDBothDiscreteFade(char number, char value, char mirror)
 {
 	if (number < 11)
-		setLEDDiscrete(number, value);
+		setLEDDiscreteFade(number, value);
 	
 	if (mirror)
 		number = 22-number;
 	else
 		number += 11;
-	setLEDDiscrete(number, value);
+	setLEDDiscreteFade(number, value);
 }
 
 void setLEDFade(char number, char value)
 {
 	framebuffer[number] = value;
-	//if (value) PWM[number] = 6;
 }
 
 void setAll (char value)
 {
 	int i;
-	for (i=0; i<23; i++) setLEDFade(i, value);
+	for (i=0; i<23; i++) setLEDDiscreteFade(i, value);
+}
+
+void firstInit()
+{
+	unsigned char i;
+	for(i=0; i<23; i++)
+	{
+		framebuffer[i] = 0;
+		PWM[i] = 0;
+		setLEDDiscrete(i, 0);
+	}
 }
 
 
@@ -292,11 +307,11 @@ void readInputs()
 			}
 					
 			if (SW4 == 1) {
-				if (delay > 1) delay--;
+				if (delay > 0) delay--;
 			}
 					
 			if (SW2 == 1) {
-				if (program <= 0) program = 1;
+				if (program <= 0) program = PROGRAM_COUNT-1;
 				else program--;
 				setAll(1);
 				newProgram = 1;
@@ -304,7 +319,7 @@ void readInputs()
 				
 			if (SW3 == 1) {
 				program++;
-				if (program > 1) program = 0;
+				if (program >= PROGRAM_COUNT) program = 0;
 				setAll(1);
 				newProgram = 1;
 			}
@@ -331,6 +346,12 @@ void programInit()
 {
 	switch(program)
 	{
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+			setAll(1);
+			break;
 		default:
 			setAll(0);
 	}
@@ -341,16 +362,56 @@ void programRun()
 	switch(program)
 	{
 		case 0:
-			setLEDFade(globalI, 0);
+			setLEDDiscreteFade(globalI, 0);
 			globalI++;
 			if (globalI >= 23) globalI = 0;
-			setLEDFade(globalI, 1);
+			setLEDDiscreteFade(globalI, 1);
 			break;
 		case 1:
-			setLEDFade(globalI, 0);
+			setLEDDiscreteFade(globalI, 0);
 			globalI--;
 			if (globalI >= 23) globalI = 22;
-			setLEDFade(globalI, 1);
+			setLEDDiscreteFade(globalI, 1);
+			break;
+		case 2:
+			setLEDDiscreteFade(globalI, 1);
+			globalI++;
+			if (globalI >= 23) globalI = 0;
+			setLEDDiscreteFade(globalI, 0);
+			break;
+		case 3:
+			setLEDDiscreteFade(globalI, 1);
+			globalI--;
+			if (globalI >= 23) globalI = 22;
+			setLEDDiscreteFade(globalI, 0);
+			break;
+		case 4:
+			setLEDDiscreteFade(globalI, 1);
+			globalI++;
+			if (globalI >= 23) globalI = 0;
+			setLEDDiscreteFade((globalI+2)%23, 0);
+			break;
+		case 5:
+			setLEDDiscreteFade(globalI, 1);
+			globalI--;
+			if (globalI >= 23) globalI = 22;
+			setLEDDiscreteFade((globalI-2+23)%23, 0);
+			break;
+		case 6:
+			setLEDDiscreteFade(globalI, 0);
+			setLEDDiscreteFade(23-globalI, 0);
+			globalI++;
+			if (globalI >= 23) globalI = 0;
+			setLEDDiscreteFade(globalI, 1);
+			setLEDDiscreteFade(23-globalI, 1);
+			break;
+		case 7:
+			setLEDBothDiscreteFade(globalI, 0, 0);
+			setLEDBothDiscreteFade(11-globalI, 0, 0);
+			globalI++;
+			if (globalI >= 11) globalI = 0;
+			setLEDBothDiscreteFade(globalI, 1, 0);
+			setLEDBothDiscreteFade(11-globalI, 1, 0);
 			break;
 	}
 }
@@ -364,6 +425,7 @@ void main()
 	unsigned char pwmpos=0, pwmled=0;
 	on_init();
 	timer1_init();
+	firstInit();
 	programInit();
 	
 	while(1)
@@ -375,13 +437,13 @@ void main()
 				setLEDDiscrete(pwmled, PWM[pwmled] > pwmpos);
 			}
 			pwmpos++;
-			if (pwmpos >= 6) pwmpos = 0;
+			if (pwmpos >= PWM_LENGTH) pwmpos = 0;
 			
 			if (k>20) {
 				for(pwmled=0; pwmled<23; pwmled++)
 				{
-					if (!framebuffer[pwmled] && PWM[pwmled]) PWM[pwmled]--;
-					if (framebuffer[pwmled]  && PWM[pwmled] < 6) PWM[pwmled]++;
+					if (framebuffer[pwmled] < PWM[pwmled]) PWM[pwmled]--;
+					if (framebuffer[pwmled] > PWM[pwmled]) PWM[pwmled]++;
 				}
 				k=0;
 			}

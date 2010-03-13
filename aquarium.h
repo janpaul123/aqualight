@@ -62,7 +62,10 @@
 #define TRIS_LED20 TRISBbits.TRISB5
 
 // number of PWM cycles
-#define PWM_LENGTH 22
+#define PWM_LENGTH 6
+
+// number of programs
+#define PROGRAM_COUNT 8
 
 // timer settings
 #define TMR1_PERIOD 1000 
