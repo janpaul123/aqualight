@@ -38,6 +38,7 @@ unsigned char PWM[23];
 
 unsigned char globalI=0;
 unsigned char globalJ=0;
+unsigned char globalK=0;
 
 
 
@@ -359,6 +360,12 @@ void programInit()
 			globalJ = 3;
 			setAll(0);
 			break;
+		case 9:
+			globalJ = 1;
+			globalI = 0;
+			globalK = 11;
+			setAll(0);
+			break;
 		default:
 			setAll(0);
 	}
@@ -430,6 +437,59 @@ void programRun()
 				if(globalJ >= 22) globalJ = 3;
 				globalI = 0;
 			}
+			break;
+		case 9:
+			if(globalJ == 1)
+			{
+				if(globalI >= 11)
+				{
+					globalJ = 0;
+				}
+				else
+				{
+					globalI++;
+				}
+			}
+			else
+			{
+				if(globalI == 0)
+				{
+					globalJ = 1;
+				}
+				else
+				{
+					globalI--;
+				}
+			}
+			setLEDBothDiscreteFade(globalI,globalJ,0);
+			break;
+		case 10:
+			if(globalJ == 1)
+			{
+				if(globalI >= globalK)
+				{
+					globalJ = 0;
+				}
+				else
+				{
+					globalI++;
+				}
+			}
+			else
+			{
+				if(globalI == 0)
+				{
+					globalJ = 1;
+					if(globalK == 0) globalK = 11;
+					else globalK--;
+				}
+				else
+				{
+					globalI--;
+				}
+			}
+			setLEDBothDiscreteFade(globalI,globalJ,0);
+			break;
 	}
 }
 
