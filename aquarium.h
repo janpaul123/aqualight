@@ -65,7 +65,7 @@
 #define PWM_LENGTH 6
 
 // number of programs
-#define PROGRAM_COUNT 13
+#define PROGRAM_COUNT 15
 
 // timer settings
 #define TMR1_PERIOD 1000 

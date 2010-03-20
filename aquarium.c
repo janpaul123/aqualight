@@ -304,29 +304,63 @@ void readInputs()
 	{
 		if (!wait)
 		{
-			if (SW1 == 1) {
-				if (delay < 40) delay++;
-			}
+			if(program == 14)
+			{
+				if (SW1 == 1) {
+					setColor(globalI,0,0);
+					globalI = (globalI - 1) % 6;
+					setColor(globalI,1,0);
+				}
+						
+				if (SW4 == 1) {
+					setColor(globalI,0,0);
+					globalI = (globalI + 1) % 6;
+					setColor(globalI,1,0);
 					
-			if (SW4 == 1) {
-				if (delay > 0) delay--;
-			}
+				}
+						
+				if (SW2 == 1) {
+					if (program <= 0) program = PROGRAM_COUNT-1;
+					else program--;
+					setAll(1);
+					newProgram = 1;
+				}
 					
-			if (SW2 == 1) {
-				if (program <= 0) program = PROGRAM_COUNT-1;
-				else program--;
-				setAll(1);
-				newProgram = 1;
-			}
+				if (SW3 == 1) {
+					program++;
+					if (program >= PROGRAM_COUNT) program = 0;
+					setAll(1);
+					newProgram = 1;
+				}
 				
-			if (SW3 == 1) {
-				program++;
-				if (program >= PROGRAM_COUNT) program = 0;
-				setAll(1);
-				newProgram = 1;
+				wait = 1;
 			}
-			
-			wait = 1;
+			else
+			{
+				if (SW1 == 1) {
+					if (delay < 40) delay++;
+				}
+						
+				if (SW4 == 1) {
+					if (delay > 0) delay--;
+				}
+						
+				if (SW2 == 1) {
+					if (program <= 0) program = PROGRAM_COUNT-1;
+					else program--;
+					setAll(1);
+					newProgram = 1;
+				}
+					
+				if (SW3 == 1) {
+					program++;
+					if (program >= PROGRAM_COUNT) program = 0;
+					setAll(1);
+					newProgram = 1;
+				}
+				
+				wait = 1;
+			}
 		}
 	}
 	else
@@ -507,6 +541,18 @@ void programRun()
 			globalI++;
 			if(globalI >= 6) globalI = 0;
 			setColor(globalI,1,0);
+			break;
+		case 13:
+			setColor(globalI%6,0,1);
+			setColor((globalI*11)%6,0,2);
+			globalI++; 
+			//if(globalI >= 6) globalI = 0;
+			setColor(globalI%6,1,1);
+			setColor((globalI*11)%6,1,2);
+			break;
+		case 14:
+			break;//  color aan of uit gebeurd bij de knoppen 
+			
 	}
 }
 
